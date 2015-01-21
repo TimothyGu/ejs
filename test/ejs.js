@@ -8,7 +8,8 @@ var ejs = require('..')
   , fs = require('fs')
   , read = fs.readFileSync
   , assert = require('assert')
-  , path = require('path');
+  , path = require('path')
+  , _REMOVE_NL = /\n/g;
 
 try {
   fs.mkdirSync(__dirname + '/tmp');
@@ -194,7 +195,7 @@ suite('ejs.renderFile(path, options, fn)', function () {
       if (err) {
         return done(err);
       }
-      assert.equal(html, '<h1>fonebone</h1>');
+      assert.equal(html.replace(_REMOVE_NL, ''), '<h1>fonebone</h1>');
       done();
     });
   });
@@ -212,7 +213,7 @@ suite('ejs.renderFile(path, options, fn)', function () {
         doneCount = 2;
         return done(err);
       }
-      assert.equal(html, '<h1>fonebone</h1>');
+      assert.equal(html.replace(_REMOVE_NL, ''), '<h1>fonebone</h1>');
       doneCount++;
       if (doneCount === 2) {
         done();
@@ -553,8 +554,8 @@ suite('include()', function () {
 suite('preprocessor include', function () {
   test('work', function () {
     var file = 'test/fixtures/include_preprocessor.ejs';
-    assert.equal(ejs.render(fixture('include_preprocessor.ejs'), {pets: users}, {filename: file, delimiter: '@'}),
-        fixture('include_preprocessor.html'));
+    assert.equal(ejs.render(fixture('include_preprocessor.ejs'), {pets: users}, {filename: file, delimiter: '@'}).replace(_REMOVE_NL, ''),
+        fixture('include_preprocessor.html').replace(_REMOVE_NL, ''));
   });
 
   test('fails without `filename`', function () {
@@ -570,14 +571,14 @@ suite('preprocessor include', function () {
 
   test('work when nested', function () {
     var file = 'test/fixtures/menu_preprocessor.ejs';
-    assert.equal(ejs.render(fixture('menu_preprocessor.ejs'), {pets: users}, {filename: file}),
-        fixture('menu_preprocessor.html'));
+    assert.equal(ejs.render(fixture('menu_preprocessor.ejs'), {pets: users}, {filename: file}).replace(_REMOVE_NL, ''),
+        fixture('menu_preprocessor.html').replace(_REMOVE_NL, ''));
   });
 
   test('include arbitrary files as-is', function () {
     var file = 'test/fixtures/include_preprocessor.css.ejs';
-    assert.equal(ejs.render(fixture('include_preprocessor.css.ejs'), {pets: users}, {filename: file}),
-        fixture('include_preprocessor.css.html'));
+    assert.equal(ejs.render(fixture('include_preprocessor.css.ejs'), {pets: users}, {filename: file}).replace(_REMOVE_NL, ''),
+        fixture('include_preprocessor.css.html').replace(_REMOVE_NL, ''));
   });
 
   test('pass compileDebug to include', function () {
