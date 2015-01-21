@@ -474,6 +474,7 @@ suite('exceptions', function () {
   });
 });
 
+/*
 suite('include()', function () {
   test('include ejs', function () {
     var file = 'test/fixtures/include-simple.ejs';
@@ -563,6 +564,7 @@ suite('include()', function () {
     assert.equal(out, expected);
   });
 });
+ */
 
 suite('preprocessor include', function () {
   test('work', function () {
