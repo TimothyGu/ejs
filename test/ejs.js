@@ -10,6 +10,14 @@ var ejs = require('..')
   , assert = require('assert')
   , path = require('path');
 
+try {
+  fs.mkdirSync(__dirname + '/tmp');
+} catch (ex) {
+  if (ex.code !== 'EEXIST') {
+    throw ex;
+  }
+}
+
 // From https://gist.github.com/pguillory/729616
 function hook_stdout(callback) {
   var old_write = process.stdout.write;
@@ -150,6 +158,22 @@ suite('ejs.render(str, data)', function () {
                  {_with: false});
     }, /name is not defined/);
   });
+
+  test('support caching (pass 1)', function () {
+    var file = __dirname + '/tmp/render.ejs'
+      , options = {cache: true, filename: file}
+      , out = ejs.render('<p>Old</p>', {}, options)
+      , expected = '<p>Old</p>';
+    assert.equal(out, expected);
+  });
+
+  test('support caching (pass 2)', function () {
+    var file = __dirname + '/tmp/render.ejs'
+      , options = {cache: true, filename: file}
+      , out = ejs.render('<p>New</p>', {}, options)
+      , expected = '<p>Old</p>';
+    assert.equal(out, expected);
+  });
 });
 
 suite('ejs.renderFile(path, options, fn)', function () {
@@ -221,20 +245,89 @@ suite('ejs.renderFile(path, options, fn)', function () {
       done();
     });
     d.run(function () {
-      ejs.renderFile('test/fixtures/user.ejs', data, options, function(err) {
-        counter++;
-        if (err) {
-          assert.notEqual(err.message, 'Exception in callback');
-          return done(err);
-        }
-        throw new Error('Exception in callback');
+      // process.nextTick() needed to work around mochajs/mocha#513
+      //
+      // tl;dr: mocha doesn't support synchronous exception throwing in
+      // domains. Have to make it async. Ticket closed because: "domains are
+      // deprecated :D"
+      process.nextTick(function () {
+        ejs.renderFile('test/fixtures/user.ejs', data, options,
+                       function(err) {
+          counter++;
+          if (err) {
+            assert.notEqual(err.message, 'Exception in callback');
+            return done(err);
+          }
+          throw new Error('Exception in callback');
+        });
       });
+    });
+  });
+
+  test('support caching (pass 1)', function (done) {
+    var expected = '<p>Old</p>'
+      , file = __dirname + '/tmp/renderFile.ejs'
+      , options = {cache: true}
+    fs.writeFileSync(file, '<p>Old</p>');
+
+    var out = ejs.renderFile(file, {}, options, function (err, out) {
+      if (err) {
+        done(err);
+      }
+      assert.equal(out, expected);
+      done();
+    });
+  });
+
+  test('support caching (pass 2)', function (done) {
+    var expected = '<p>Old</p>'
+      , file = __dirname + '/tmp/renderFile.ejs'
+      , options = {cache: true}
+    fs.writeFileSync(file, '<p>New</p>');
+
+    var out = ejs.renderFile(file, {}, options, function (err, out) {
+      if (err) {
+        done(err);
+      }
+      assert.equal(out, expected);
+      done();
     });
   });
 });
 
-suite('<%=', function () {
+suite('ejs.clearCache()', function () {
+  test('work properly', function () {
+    var expected = '<p>Old</p>'
+      , file = __dirname + '/tmp/clearCache.ejs'
+      , options = {cache: true, filename: file}
+      , out = ejs.render('<p>Old</p>', {}, options);
+    assert.equal(out, expected);
 
+    ejs.clearCache();
+
+    expected = '<p>New</p>';
+    out = ejs.render('<p>New</p>', {}, options);
+    assert.equal(out, expected);
+  });
+});
+
+suite('ejs.clearCache()', function () {
+  test('work properly', function () {
+    var expected = '<p>Old</p>'
+      , file = __dirname + '/tmp/clearCache.ejs'
+      , options = {cache: true, filename: file}
+      , out = ejs.render('<p>Old</p>', {}, options);
+    assert.equal(out, expected);
+
+    ejs.clearCache();
+
+    expected = '<p>New</p>';
+    out = ejs.render('<p>New</p>', {}, options);
+    assert.equal(out, expected);
+  });
+});
+
+suite('<%=', function () {
   test('escape &amp;<script>', function () {
     assert.equal(ejs.render('<%= name %>', {name: '&nbsp;<script>'}),
         '&amp;nbsp;&lt;script&gt;');
@@ -293,7 +386,7 @@ suite('<%%', function () {
   });
   test('work without an end tag', function () {
     assert.equal(ejs.render('<%%'), '<%');
-    assert.equal(ejs.render(fixture('literal.ejs'), {delimiter: ' '}),
+    assert.equal(ejs.render(fixture('literal.ejs'), {}, {delimiter: ' '}),
       fixture('literal.html'));
   });
 });
@@ -329,7 +422,7 @@ suite('messed up whitespace', function () {
 suite('exceptions', function () {
   test('produce useful stack traces', function () {
     try {
-      ejs.render(fixture('error.ejs'), {filename: 'error.ejs'});
+      ejs.render(fixture('error.ejs'), {}, {filename: 'error.ejs'});
     }
     catch (err) {
       assert.equal(err.path, 'error.ejs');
@@ -381,7 +474,7 @@ suite('exceptions', function () {
   });
 });
 
-suite('includes', function () {
+suite('include()', function () {
   test('include ejs', function () {
     var file = 'test/fixtures/include-simple.ejs';
     assert.equal(ejs.render(fixture('include-simple.ejs'), {}, {filename: file}),
@@ -452,13 +545,33 @@ suite('includes', function () {
     throw new Error('no error reported when there should be');
   });
 
-  test('preprocessor include ejs', function () {
+  test('support caching (pass 1)', function () {
+    fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>Old</p>');
+    var file = 'test/fixtures/include_cache.ejs'
+      , options = {cache: true, filename: file}
+      , out = ejs.render(fixture('include_cache.ejs'), {}, options)
+      , expected = fixture('include_cache.html');
+    assert.equal(out, expected);
+  });
+
+  test('support caching (pass 2)', function () {
+    fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>New</p>');
+    var file = 'test/fixtures/include_cache.ejs'
+      , options = {cache: true, filename: file}
+      , out = ejs.render(fixture('include_cache.ejs'), {}, options)
+      , expected = fixture('include_cache.html');
+    assert.equal(out, expected);
+  });
+});
+
+suite('preprocessor include', function () {
+  test('work', function () {
     var file = 'test/fixtures/include_preprocessor.ejs';
     assert.equal(ejs.render(fixture('include_preprocessor.ejs'), {pets: users}, {filename: file, delimiter: '@'}),
         fixture('include_preprocessor.html'));
   });
 
-  test('preprocessor include ejs fails without `filename`', function () {
+  test('fails without `filename`', function () {
     try {
       ejs.render(fixture('include_preprocessor.ejs'), {pets: users}, {delimiter: '@'});
     }
@@ -469,19 +582,19 @@ suite('includes', function () {
     throw new Error('expected inclusion error');
   });
 
-  test('preprocessor work when nested', function () {
+  test('work when nested', function () {
     var file = 'test/fixtures/menu_preprocessor.ejs';
     assert.equal(ejs.render(fixture('menu_preprocessor.ejs'), {pets: users}, {filename: file}),
         fixture('menu_preprocessor.html'));
   });
 
-  test('preprocessor include arbitrary files as-is', function () {
+  test('include arbitrary files as-is', function () {
     var file = 'test/fixtures/include_preprocessor.css.ejs';
     assert.equal(ejs.render(fixture('include_preprocessor.css.ejs'), {pets: users}, {filename: file}),
         fixture('include_preprocessor.css.html'));
   });
 
-  test('preprocessor pass compileDebug to include', function () {
+  test('pass compileDebug to include', function () {
     var file = 'test/fixtures/include_preprocessor.ejs'
       , fn;
     fn = ejs.compile(fixture('include_preprocessor.ejs'), {
@@ -499,6 +612,24 @@ suite('includes', function () {
       return;
     }
     throw new Error('no error reported when there should be');
+  });
+
+  test('support caching (pass 1)', function () {
+    fs.writeFileSync(__dirname + '/tmp/include_preprocessor.ejs', '<p>Old</p>');
+    var file = 'test/fixtures/include_preprocessor_cache.ejs'
+      , options = {cache: true, filename: file}
+      , out = ejs.render(fixture('include_preprocessor_cache.ejs'), {}, options)
+      , expected = fixture('include_preprocessor_cache.html');
+    assert.equal(out, expected);
+  });
+
+  test('support caching (pass 2)', function () {
+    fs.writeFileSync(__dirname + '/tmp/include_preprocessor.ejs', '<p>New</p>');
+    var file = 'test/fixtures/include_preprocessor_cache.ejs'
+      , options = {cache: true, filename: file}
+      , out = ejs.render(fixture('include_preprocessor_cache.ejs'), {}, options)
+      , expected = fixture('include_preprocessor_cache.html');
+    assert.equal(out, expected);
   });
 });
 
