@@ -216,7 +216,6 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
     });
   });
 
-/*
   test('deprecation warning for data-in-opts', function(done) {
     var data =  {name: 'fonebone', delimiter: '$'}
       , options = {delimiter: '$'}
@@ -254,14 +253,13 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
       if (err) {
         return done(err);
       }
-      assert.equal(html, '<h1>fonebone</h1>');
+      assert.equal(html.replace(_REMOVE_NL, ''), '<h1>fonebone</h1>');
       assert.equal(incr, 0);
       console.warn = warn;
 
       done();
     });
   });
-*/
 
   test('accept locals without using with() {}', function(done) {
     var data =  {name: 'fonebone'}

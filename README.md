@@ -1,9 +1,10 @@
-# EJS
-
-Embedded JavaScript templates
+# EJS -- Embedded JavaScript templates
 
 [![Build Status](https://img.shields.io/travis/TimothyGu/ejs/master.svg?style=flat)](https://travis-ci.org/TimothyGu/ejs)
 [![Developing Dependencies](https://img.shields.io/david/dev/TimothyGu/ejs.svg?style=flat)](https://david-dm.org/TimothyGu/ejs#info=devDependencies)
+
+This repo is a WIP of [**@TimothyGu**](https://github.com/TimothyGu) meant to
+merge [**@mde**](https://github.com/mde)'s EJS v2 to the original @tj's EJS, for mainly performance reasons.
 
 ## Installation
 
@@ -153,6 +154,9 @@ Licensed under the Apache License, Version 2.0
 
 - - -
 EJS Embedded JavaScript templates copyright 2112
-mde@fleegix.org.
+
+- Copyright 2012 TJ Holowaychuk <tj@vision-media.ca>
+- Copyright 2112 Matthew Eernisse <mde@fleegix.org>
+- Copyright 2112 Tiancheng "Timothy" Gu <timothygu99@gmail.com>
 
 
