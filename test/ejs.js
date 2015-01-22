@@ -1,4 +1,6 @@
 /* jshint mocha: true */
+/* jshint globalstrict: false */
+/* jshint strict: false */
 
 /**
  * Module dependencies.
@@ -8,7 +10,6 @@ var ejs = require('..')
   , fs = require('fs')
   , read = fs.readFileSync
   , assert = require('assert')
-  , path = require('path')
   , _REMOVE_NL = /\n/g;
 
 try {
@@ -218,14 +219,13 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
 
   test('deprecation warning for data-in-opts', function(done) {
     var data =  {name: 'fonebone', delimiter: '$'}
-      , options = {delimiter: '$'}
       , warn = console.warn
       , incr = 0;
 
     console.warn = function (msg) {
       assert.ok(msg.indexOf('options found in locals object') > -1);
       incr++;
-    }
+    };
 
     ejs.renderFile('test/fixtures/user.ejs', data, function(err, html) {
       if (err) {
@@ -241,13 +241,12 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
 
   test('no deprecation warning for data-in-opts via Express', function(done) {
     var data =  {name: 'fonebone', delimiter: '$'}
-      , options = {delimiter: '$'}
       , warn = console.warn
       , incr = 0;
 
-    console.warn = function (msg) {
+    console.warn = function () {
       incr++;
-    }
+    };
 
     ejs.__express('test/fixtures/user.ejs', data, function(err, html) {
       if (err) {
@@ -329,10 +328,10 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
   test('support caching (pass 1)', function (done) {
     var expected = '<p>Old</p>'
       , file = __dirname + '/tmp/renderFile.ejs'
-      , options = {cache: true}
+      , options = {cache: true};
     fs.writeFileSync(file, '<p>Old</p>');
 
-    var out = ejs.renderFile(file, {}, options, function (err, out) {
+    ejs.renderFile(file, {}, options, function (err, out) {
       if (err) {
         done(err);
       }
@@ -344,10 +343,10 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
   test('support caching (pass 2)', function (done) {
     var expected = '<p>Old</p>'
       , file = __dirname + '/tmp/renderFile.ejs'
-      , options = {cache: true}
+      , options = {cache: true};
     fs.writeFileSync(file, '<p>New</p>');
 
-    var out = ejs.renderFile(file, {}, options, function (err, out) {
+    ejs.renderFile(file, {}, options, function (err, out) {
       if (err) {
         done(err);
       }

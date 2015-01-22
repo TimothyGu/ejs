@@ -10,9 +10,9 @@ var ejs = require('../')
 
 var users = [];
 
-users.push({ name: 'Tobi', age: 2, species: 'ferret' })
-users.push({ name: 'Loki', age: 2, species: 'ferret' })
-users.push({ name: 'Jane', age: 6, species: 'ferret' })
+users.push({ name: 'Tobi', age: 2, species: 'ferret' });
+users.push({ name: 'Loki', age: 2, species: 'ferret' });
+users.push({ name: 'Jane', age: 6, species: 'ferret' });
 
 var ret = ejs.render(str, {
   users: users,
