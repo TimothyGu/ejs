@@ -10,6 +10,7 @@ var ejs = require('..')
   , fs = require('fs')
   , read = fs.readFileSync
   , assert = require('assert')
+  , path = require('path')
   , _REMOVE_NL = /\n/g;
 
 try {
@@ -519,12 +520,11 @@ suite('exceptions', function () {
   });
 });
 
-/*
 suite('include()', function () {
   test('include ejs', function () {
     var file = 'test/fixtures/include-simple.ejs';
-    assert.equal(ejs.render(fixture('include-simple.ejs'), {}, {filename: file}),
-        fixture('include-simple.html'));
+    assert.equal(ejs.render(fixture('include-simple.ejs'), {}, {filename: file}).replace(_REMOVE_NL, ''),
+        fixture('include-simple.html').replace(_REMOVE_NL, ''));
   });
 
   test('include ejs fails without `filename`', function () {
@@ -540,35 +540,35 @@ suite('include()', function () {
 
   test('include ejs with locals', function () {
     var file = 'test/fixtures/include.ejs';
-    assert.equal(ejs.render(fixture('include.ejs'), {pets: users}, {filename: file, delimiter: '@'}),
-        fixture('include.html'));
+    assert.equal(ejs.render(fixture('include.ejs'), {pets: users}, {filename: file, delimiter: '@'}).replace(_REMOVE_NL, ''),
+        fixture('include.html').replace(_REMOVE_NL, ''));
   });
 
   test('include ejs with absolute path and locals', function () {
     var file = 'test/fixtures/include-abspath.ejs';
     assert.equal(ejs.render(fixture('include-abspath.ejs'),
       {dir: path.join(__dirname, 'fixtures'), pets: users, path: path},
-      {filename: file, delimiter: '@'}),
-        fixture('include.html'));
+      {filename: file, delimiter: '@'}).replace(_REMOVE_NL, ''),
+        fixture('include.html').replace(_REMOVE_NL, ''));
   });
 
   test('work when nested', function () {
     var file = 'test/fixtures/menu.ejs';
-    assert.equal(ejs.render(fixture('menu.ejs'), {pets: users}, {filename: file}),
-        fixture('menu.html'));
+    assert.equal(ejs.render(fixture('menu.ejs'), {pets: users}, {filename: file}).replace(_REMOVE_NL, ''),
+        fixture('menu.html').replace(_REMOVE_NL, ''));
   });
 
   test('work with a variable path', function () {
     var file = 'test/fixtures/menu_var.ejs',
         includePath = 'includes/menu-item';
-    assert.equal(ejs.render(fixture('menu.ejs'), {pets: users, varPath:  includePath}, {filename: file}),
-      fixture('menu.html'));
+    assert.equal(ejs.render(fixture('menu.ejs'), {pets: users, varPath:  includePath}, {filename: file}).replace(_REMOVE_NL, ''),
+      fixture('menu.html').replace(_REMOVE_NL, ''));
   });
 
   test('include arbitrary files as-is', function () {
     var file = 'test/fixtures/include.css.ejs';
-    assert.equal(ejs.render(fixture('include.css.ejs'), {pets: users}, {filename: file}),
-        fixture('include.css.html'));
+    assert.equal(ejs.render(fixture('include.css.ejs'), {pets: users}, {filename: file}).replace(_REMOVE_NL, ''),
+        fixture('include.css.html').replace(_REMOVE_NL, ''));
   });
 
   test('pass compileDebug to include', function () {
@@ -591,12 +591,24 @@ suite('include()', function () {
     throw new Error('no error reported when there should be');
   });
 
+  test('is dynamic', function () {
+    fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>Old</p>');
+    var file = 'test/fixtures/include_cache.ejs'
+      , options = {filename: file}
+      , out = ejs.render(fixture('include_cache.ejs'), {}, options);;
+    assert.equal(out, '<p>Old</p>');
+
+    fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>New</p>');
+    out = ejs.render(fixture('include_cache.ejs'), {}, options);
+    assert.equal(out, '<p>New</p>');
+  });
+
   test('support caching (pass 1)', function () {
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>Old</p>');
     var file = 'test/fixtures/include_cache.ejs'
       , options = {cache: true, filename: file}
-      , out = ejs.render(fixture('include_cache.ejs'), {}, options)
-      , expected = fixture('include_cache.html');
+      , out = ejs.render(fixture('include_cache.ejs'), {}, options).replace(_REMOVE_NL, '')
+      , expected = fixture('include_cache.html').replace(_REMOVE_NL, '');
     assert.equal(out, expected);
   });
 
@@ -604,12 +616,11 @@ suite('include()', function () {
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>New</p>');
     var file = 'test/fixtures/include_cache.ejs'
       , options = {cache: true, filename: file}
-      , out = ejs.render(fixture('include_cache.ejs'), {}, options)
-      , expected = fixture('include_cache.html');
+      , out = ejs.render(fixture('include_cache.ejs'), {}, options).replace(_REMOVE_NL, '')
+      , expected = fixture('include_cache.html').replace(_REMOVE_NL, '');
     assert.equal(out, expected);
   });
 });
- */
 
 suite('preprocessor include', function () {
   test('work', function () {
