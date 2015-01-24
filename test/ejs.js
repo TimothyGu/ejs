@@ -595,7 +595,7 @@ suite('include()', function () {
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>Old</p>');
     var file = 'test/fixtures/include_cache.ejs'
       , options = {filename: file}
-      , out = ejs.render(fixture('include_cache.ejs'), {}, options);;
+      , out = ejs.render(fixture('include_cache.ejs'), {}, options);
     assert.equal(out, '<p>Old</p>');
 
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>New</p>');
