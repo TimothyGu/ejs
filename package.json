@@ -20,7 +20,9 @@
   },
   "bugs": "https://github.com/TimothyGu/ejs/issues",
   "homepage": "https://github.com/TimothyGu/ejs",
-  "dependencies": {},
+  "dependencies": {
+    "with": "^4.0.0"
+  },
   "devDependencies": {
     "browserify": "^8.0.3",
     "uglify-js": "^2.4.16",
