@@ -548,6 +548,13 @@ suite('include()', function () {
     throw new Error('expected inclusion error');
   });
 
+  test('strips BOM', function () {
+    assert.equal(
+      ejs.render('<%- include("fixtures/includes/bom.ejs") %>',
+        {}, {filename: path.join(__dirname, 'f.ejs')}).replace(_REMOVE_NL, ''),
+      '<p>This is a file with BOM.</p>');
+  });
+
   test('include ejs with locals', function () {
     var file = 'test/fixtures/include.ejs';
     assert.equal(ejs.render(fixture('include.ejs'), {pets: users}, {filename: file, delimiter: '@'}).replace(_REMOVE_NL, ''),
@@ -647,6 +654,13 @@ suite('preprocessor include', function () {
       return;
     }
     throw new Error('expected inclusion error');
+  });
+
+  test('strips BOM', function () {
+    assert.equal(
+      ejs.render('<% include fixtures/includes/bom.ejs %>',
+        {}, {filename: path.join(__dirname, 'f.ejs')}).replace(_REMOVE_NL, ''),
+      '<p>This is a file with BOM.</p>');
   });
 
   test('work when nested', function () {
