@@ -595,12 +595,11 @@ suite('include()', function () {
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>Old</p>');
     var file = 'test/fixtures/include_cache.ejs'
       , options = {filename: file}
-      , out = ejs.render(fixture('include_cache.ejs'), {}, options);
-    assert.equal(out, '<p>Old</p>');
+      , out = ejs.compile(fixture('include_cache.ejs'), options);
+    assert.equal(out(), '<p>Old</p>');
 
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>New</p>');
-    out = ejs.render(fixture('include_cache.ejs'), {}, options);
-    assert.equal(out, '<p>New</p>');
+    assert.equal(out(), '<p>New</p>');
   });
 
   test('support caching (pass 1)', function () {
@@ -670,6 +669,17 @@ suite('preprocessor include', function () {
       return;
     }
     throw new Error('no error reported when there should be');
+  });
+
+  test('is static', function () {
+    fs.writeFileSync(__dirname + '/tmp/include_preprocessor.ejs', '<p>Old</p>');
+    var file = 'test/fixtures/include_preprocessor_cache.ejs'
+      , options = {filename: file}
+      , out = ejs.compile(fixture('include_preprocessor_cache.ejs'), options);
+    assert.equal(out(), '<p>Old</p>');
+
+    fs.writeFileSync(__dirname + '/tmp/include_preprocessor.ejs', '<p>New</p>');
+    assert.equal(out(), '<p>Old</p>');
   });
 
   test('support caching (pass 1)', function () {
