@@ -1,9 +1,11 @@
 # EJS v2 and this project's releases
 
-## v2.2.4: UNRELEASED
+## v2.2.4-beta.1 (ejs-tj only): 2015-01-24
 
 * Only bundle rethrow() in client scripts when compileDebug is enabled
-* This is the first release of ejs-tj project
+* This is the first release of the ejs-tj project
+
+# EJS v2's releases
 
 ## v2.2.3: 2015-01-23
 

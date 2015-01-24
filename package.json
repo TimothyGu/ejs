@@ -6,7 +6,7 @@
     "engine",
     "ejs"
   ],
-  "version": "2.1.4",
+  "version": "2.2.4-beta.1",
   "author": "TJ Holowaychuk <tj@vision-media.ca>",
   "contributors": [
     "Matthew Eernisse <mde@fleegix.org> (http://fleegix.org)",
