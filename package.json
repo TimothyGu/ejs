@@ -1,12 +1,12 @@
 {
-  "name": "ejs",
-  "description": "Embedded JavaScript templates",
+  "name": "ejs-tj",
+  "description": "Embedded JavaScript templates -- TJ's implementation",
   "keywords": [
     "template",
     "engine",
     "ejs"
   ],
-  "version": "3.0.0-beta.0",
+  "version": "2.1.4",
   "author": "TJ Holowaychuk <tj@vision-media.ca>",
   "contributors": [
     "Matthew Eernisse <mde@fleegix.org> (http://fleegix.org)",

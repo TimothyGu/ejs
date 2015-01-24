@@ -1,6 +1,9 @@
+# EJS v2 and this project's releases
+
 ## v2.2.4: UNRELEASED
 
 * Only bundle rethrow() in client scripts when compileDebug is enabled
+* This is the first release of ejs-tj project
 
 ## v2.2.3: 2015-01-23
 
@@ -97,6 +100,8 @@
 + Comment tag support (`<%#`)
 * Data and options now separate params (i.e., `render(str, data, options);`)
 - Removed support for filters
+
+# TJ's releases
 
 ## 1.0.0: 2014-03-24
 
