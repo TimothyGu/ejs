@@ -1,5 +1,9 @@
 # EJS v2 and this project's releases
 
+## v2.2.4-beta.2 (ejs-tj only): 2015-01-24
+
+* Fix repo URL in package.json
+
 ## v2.2.4-beta.1 (ejs-tj only): 2015-01-24
 
 * Only bundle rethrow() in client scripts when compileDebug is enabled

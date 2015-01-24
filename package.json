@@ -16,10 +16,10 @@
   "main": "./lib/ejs.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/TimothyGu/ejs.git"
+    "url": "git://github.com/TimothyGu/ejs-tj.git"
   },
-  "bugs": "https://github.com/TimothyGu/ejs/issues",
-  "homepage": "https://github.com/TimothyGu/ejs",
+  "bugs": "https://github.com/TimothyGu/ejs-tj/issues",
+  "homepage": "https://github.com/TimothyGu/ejs-tj",
   "dependencies": {},
   "devDependencies": {
     "browserify": "^8.0.3",
