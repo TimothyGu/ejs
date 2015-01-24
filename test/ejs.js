@@ -1,6 +1,4 @@
 /* jshint mocha: true */
-/* jshint globalstrict: false */
-/* jshint strict: false */
 
 /**
  * Module dependencies.
