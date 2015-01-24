@@ -8,8 +8,7 @@ var ejs = require('..')
   , fs = require('fs')
   , read = fs.readFileSync
   , assert = require('assert')
-  , path = require('path')
-  , _REMOVE_NL = /\n/g;
+  , path = require('path');
 
 try {
   fs.mkdirSync(__dirname + '/tmp');
@@ -211,7 +210,7 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
       if (err) {
         return done(err);
       }
-      assert.equal(html.replace(_REMOVE_NL, ''), '<h1>fonebone</h1>');
+      assert.equal(html, '<h1>fonebone</h1>');
       done();
     });
   });
@@ -230,7 +229,7 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
       if (err) {
         return done(err);
       }
-      assert.equal(html.replace(_REMOVE_NL, ''), '<h1>fonebone</h1>');
+      assert.equal(html, '<h1>fonebone</h1>');
       assert.equal(incr, 1);
       console.warn = warn;
 
@@ -251,7 +250,7 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
       if (err) {
         return done(err);
       }
-      assert.equal(html.replace(_REMOVE_NL, ''), '<h1>fonebone</h1>');
+      assert.equal(html, '<h1>fonebone</h1>');
       assert.equal(incr, 0);
       console.warn = warn;
 
@@ -272,7 +271,7 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
         doneCount = 2;
         return done(err);
       }
-      assert.equal(html.replace(_REMOVE_NL, ''), '<h1>fonebone</h1>');
+      assert.equal(html, '<h1>fonebone</h1>');
       doneCount++;
       if (doneCount === 2) {
         done();
@@ -533,8 +532,8 @@ suite('exceptions', function () {
 suite('include()', function () {
   test('include ejs', function () {
     var file = 'test/fixtures/include-simple.ejs';
-    assert.equal(ejs.render(fixture('include-simple.ejs'), {}, {filename: file}).replace(_REMOVE_NL, ''),
-        fixture('include-simple.html').replace(_REMOVE_NL, ''));
+    assert.equal(ejs.render(fixture('include-simple.ejs'), {}, {filename: file}),
+        fixture('include-simple.html'));
   });
 
   test('include ejs fails without `filename`', function () {
@@ -551,41 +550,41 @@ suite('include()', function () {
   test('strips BOM', function () {
     assert.equal(
       ejs.render('<%- include("fixtures/includes/bom.ejs") %>',
-        {}, {filename: path.join(__dirname, 'f.ejs')}).replace(_REMOVE_NL, ''),
+        {}, {filename: path.join(__dirname, 'f.ejs')}),
       '<p>This is a file with BOM.</p>');
   });
 
   test('include ejs with locals', function () {
     var file = 'test/fixtures/include.ejs';
-    assert.equal(ejs.render(fixture('include.ejs'), {pets: users}, {filename: file, delimiter: '@'}).replace(_REMOVE_NL, ''),
-        fixture('include.html').replace(_REMOVE_NL, ''));
+    assert.equal(ejs.render(fixture('include.ejs'), {pets: users}, {filename: file, delimiter: '@'}),
+        fixture('include.html'));
   });
 
   test('include ejs with absolute path and locals', function () {
     var file = 'test/fixtures/include-abspath.ejs';
     assert.equal(ejs.render(fixture('include-abspath.ejs'),
       {dir: path.join(__dirname, 'fixtures'), pets: users, path: path},
-      {filename: file, delimiter: '@'}).replace(_REMOVE_NL, ''),
-        fixture('include.html').replace(_REMOVE_NL, ''));
+      {filename: file, delimiter: '@'}),
+        fixture('include.html'));
   });
 
   test('work when nested', function () {
     var file = 'test/fixtures/menu.ejs';
-    assert.equal(ejs.render(fixture('menu.ejs'), {pets: users}, {filename: file}).replace(_REMOVE_NL, ''),
-        fixture('menu.html').replace(_REMOVE_NL, ''));
+    assert.equal(ejs.render(fixture('menu.ejs'), {pets: users}, {filename: file}),
+        fixture('menu.html'));
   });
 
   test('work with a variable path', function () {
     var file = 'test/fixtures/menu_var.ejs',
         includePath = 'includes/menu-item';
-    assert.equal(ejs.render(fixture('menu.ejs'), {pets: users, varPath:  includePath}, {filename: file}).replace(_REMOVE_NL, ''),
-      fixture('menu.html').replace(_REMOVE_NL, ''));
+    assert.equal(ejs.render(fixture('menu.ejs'), {pets: users, varPath:  includePath}, {filename: file}),
+      fixture('menu.html'));
   });
 
   test('include arbitrary files as-is', function () {
     var file = 'test/fixtures/include.css.ejs';
-    assert.equal(ejs.render(fixture('include.css.ejs'), {pets: users}, {filename: file}).replace(_REMOVE_NL, ''),
-        fixture('include.css.html').replace(_REMOVE_NL, ''));
+    assert.equal(ejs.render(fixture('include.css.ejs'), {pets: users}, {filename: file}),
+        fixture('include.css.html'));
   });
 
   test('pass compileDebug to include', function () {
@@ -623,8 +622,8 @@ suite('include()', function () {
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>Old</p>');
     var file = 'test/fixtures/include_cache.ejs'
       , options = {cache: true, filename: file}
-      , out = ejs.render(fixture('include_cache.ejs'), {}, options).replace(_REMOVE_NL, '')
-      , expected = fixture('include_cache.html').replace(_REMOVE_NL, '');
+      , out = ejs.render(fixture('include_cache.ejs'), {}, options)
+      , expected = fixture('include_cache.html');
     assert.equal(out, expected);
   });
 
@@ -632,8 +631,8 @@ suite('include()', function () {
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>New</p>');
     var file = 'test/fixtures/include_cache.ejs'
       , options = {cache: true, filename: file}
-      , out = ejs.render(fixture('include_cache.ejs'), {}, options).replace(_REMOVE_NL, '')
-      , expected = fixture('include_cache.html').replace(_REMOVE_NL, '');
+      , out = ejs.render(fixture('include_cache.ejs'), {}, options)
+      , expected = fixture('include_cache.html');
     assert.equal(out, expected);
   });
 });
@@ -641,8 +640,8 @@ suite('include()', function () {
 suite('preprocessor include', function () {
   test('work', function () {
     var file = 'test/fixtures/include_preprocessor.ejs';
-    assert.equal(ejs.render(fixture('include_preprocessor.ejs'), {pets: users}, {filename: file, delimiter: '@'}).replace(_REMOVE_NL, ''),
-        fixture('include_preprocessor.html').replace(_REMOVE_NL, ''));
+    assert.equal(ejs.render(fixture('include_preprocessor.ejs'), {pets: users}, {filename: file, delimiter: '@'}),
+        fixture('include_preprocessor.html'));
   });
 
   test('fails without `filename`', function () {
@@ -659,20 +658,20 @@ suite('preprocessor include', function () {
   test('strips BOM', function () {
     assert.equal(
       ejs.render('<% include fixtures/includes/bom.ejs %>',
-        {}, {filename: path.join(__dirname, 'f.ejs')}).replace(_REMOVE_NL, ''),
+        {}, {filename: path.join(__dirname, 'f.ejs')}),
       '<p>This is a file with BOM.</p>');
   });
 
   test('work when nested', function () {
     var file = 'test/fixtures/menu_preprocessor.ejs';
-    assert.equal(ejs.render(fixture('menu_preprocessor.ejs'), {pets: users}, {filename: file}).replace(_REMOVE_NL, ''),
-        fixture('menu_preprocessor.html').replace(_REMOVE_NL, ''));
+    assert.equal(ejs.render(fixture('menu_preprocessor.ejs'), {pets: users}, {filename: file}),
+        fixture('menu_preprocessor.html'));
   });
 
   test('include arbitrary files as-is', function () {
     var file = 'test/fixtures/include_preprocessor.css.ejs';
-    assert.equal(ejs.render(fixture('include_preprocessor.css.ejs'), {pets: users}, {filename: file}).replace(_REMOVE_NL, ''),
-        fixture('include_preprocessor.css.html').replace(_REMOVE_NL, ''));
+    assert.equal(ejs.render(fixture('include_preprocessor.css.ejs'), {pets: users}, {filename: file}),
+        fixture('include_preprocessor.css.html'));
   });
 
   test('pass compileDebug to include', function () {
