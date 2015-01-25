@@ -1,7 +1,7 @@
 # EJS -- Embedded JavaScript templates
 
-[![Build Status](https://img.shields.io/travis/TimothyGu/ejs/master.svg?style=flat)](https://travis-ci.org/TimothyGu/ejs)
-[![Developing Dependencies](https://img.shields.io/david/dev/TimothyGu/ejs.svg?style=flat)](https://david-dm.org/TimothyGu/ejs#info=devDependencies)
+[![Build Status](https://img.shields.io/travis/TimothyGu/ejs-tj/master.svg?style=flat)](https://travis-ci.org/TimothyGu/ejs-tj)
+[![Developing Dependencies](https://img.shields.io/david/dev/TimothyGu/ejs-tj.svg?style=flat)](https://david-dm.org/TimothyGu/ejs-tj#info=devDependencies)
 
 This repo is a continuation of TJ Holowaychuk's original EJS project.
 
