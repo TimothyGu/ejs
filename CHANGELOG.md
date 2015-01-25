@@ -1,5 +1,10 @@
 # EJS v2 and this project's releases
 
+## v2.2.4-beta.4 (ejs-tj only): 2015-01-24
+
+* Copy `_with` from locals object to options object (@TimothyGu)
+* Add `ejs.version` like upstream does
+
 ## v2.2.4-beta.3 (ejs-tj only): 2015-01-24
 
 * Fix new line slurping mode without a space before `-%>`
@@ -11,6 +16,7 @@
 ## v2.2.4-beta.1 (ejs-tj only): 2015-01-24
 
 * Only bundle rethrow() in client scripts when compileDebug is enabled
+  (@TimothyGu)
 * This is the first release of the ejs-tj project
 
 # EJS v2's releases
