@@ -1,5 +1,9 @@
 # EJS v2 and this project's releases
 
+## v2.2.4-beta.3 (ejs-tj only): 2015-01-24
+
+* Fix new line slurping mode without a space before `-%>`
+
 ## v2.2.4-beta.2 (ejs-tj only): 2015-01-24
 
 * Fix repo URL in package.json
