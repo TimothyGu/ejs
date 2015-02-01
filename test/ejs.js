@@ -175,6 +175,18 @@ suite('ejs.render(str, data)', function () {
     }, /name is not defined/);
   });
 
+  test('accept custom name for locals', function () {
+    ejs.localsName = 'it';
+    assert.equal(ejs.render('<p><%= it.name %></p>', {name: 'geddy'},
+                            {_with: false}),
+        '<p>geddy</p>');
+    assert.throws(function() {
+      ejs.render('<p><%= name %></p>', {name: 'geddy'},
+                 {_with: false});
+    }, /name is not defined/);
+    ejs.localsName = 'locals';
+  });
+
   test('support caching (pass 1)', function () {
     var file = __dirname + '/tmp/render.ejs'
       , options = {cache: true, filename: file}
@@ -201,6 +213,17 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
       assert.equal(html, '<p>hey</p>');
       done();
     });
+  });
+
+  test('callback is async', function(done) {
+    var async = false;
+    ejs.renderFile('test/fixtures/para.ejs', function(err, html) {
+      if (async) {
+        return done();
+      }
+      throw new Error('not async');
+    });
+    async = true;
   });
 
   test('accept locals', function(done) {
