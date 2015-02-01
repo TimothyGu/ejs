@@ -3,8 +3,15 @@
 ## v2.2.4: 2015-02-01
 
 + Ability to customize name of the locals object with `ejs.localsName` (@mde)
++ Ability to override `resolveInclude` for include-path lookup
+  (@olivierkaisin)
 * Only bundle rethrow() in client scripts when compileDebug is enabled
   (@TimothyGu)
+* Removed deprecation warnings (@mde)
+* Significantly increased performance (@TimothyGu)
+* Defer execution for `renderFile` callback, ensure async (@TimothyGu)
+* Fix Browserified JavaScript (@TimothyGu) (ejs-tj only)
+* Fix `ejs.VERSION` (@TimothyGu) (ejs-tj only)
 
 ## v2.2.4-beta.4 (ejs-tj only): 2015-01-24
 
