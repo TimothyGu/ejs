@@ -1,13 +1,14 @@
-
-/**
- * Module dependencies.
+/*
+ * This example demonstrates how to use Array.prototype.forEach() in an EJS
+ * template.
  */
 
 var ejs = require('../')
-  , fs = require('fs')
-  , str = fs.readFileSync(__dirname + '/list.ejs', 'utf8');
+  , read = require('fs').readFileSync
+  , join = require('path').join
+  , str = read(join(__dirname, '/list.ejs'), 'utf8');
 
-var ret = ejs.render(str, {
+var ret = ejs.compile(str)({
   names: ['foo', 'bar', 'baz']
 });
 

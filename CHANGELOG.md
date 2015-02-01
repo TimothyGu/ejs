@@ -1,5 +1,11 @@
 # EJS v2 and this project's releases
 
+## v2.2.4: 2015-02-01
+
++ Ability to customize name of the locals object with `ejs.localsName` (@mde)
+* Only bundle rethrow() in client scripts when compileDebug is enabled
+  (@TimothyGu)
+
 ## v2.2.4-beta.4 (ejs-tj only): 2015-01-24
 
 * Copy `_with` from locals object to options object (@TimothyGu)
@@ -15,8 +21,6 @@
 
 ## v2.2.4-beta.1 (ejs-tj only): 2015-01-24
 
-* Only bundle rethrow() in client scripts when compileDebug is enabled
-  (@TimothyGu)
 * This is the first release of the ejs-tj project
 
 # EJS v2's releases
