@@ -1,5 +1,24 @@
 # EJS v2 and this project's releases
 
+## v2.2.5: UNRELEASED
+
++ Generated template functions are now prettier (ejs only) (@whitneyit)
++ Add official documentation for EJS syntax (#9) (@TimothyGu)
++ Add inline JSDoc-style documentation for public functions (mde/ejs#9)
+  (@TimothyGu)
++ Add a new dynamic client-side template compilation example in
+  `examples/client-compile.html` (@TimothyGu)
+* Fix running on Node.js v0.8. Note that we still do not support 0.8
+  officially, but if you found something that can be fixed easily please
+  point it out. (mde/ejs#57) (@TimothyGu)
+* Do not trim newlines at the end of files. This might be considered
+  incompatible by some, but the new behavior is the correct one, and is
+  consistent with EJS v1. (mde/ejs#60) (@TimothyGu)
+* Readd deprecation warning for `scope` option that was removed in v2.2.4. It
+  never caused any problems with Express or anything else so its removal was
+  a mistake. (@TimothyGu)
+* Always rethrow the error from `new Function()` (@TimothyGu)
+
 ## v2.2.4: 2015-02-01
 
 + Ability to customize name of the locals object with `ejs.localsName` (@mde)

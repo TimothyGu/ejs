@@ -8,7 +8,8 @@ var ejs = require('..')
   , fs = require('fs')
   , read = fs.readFileSync
   , assert = require('assert')
-  , path = require('path');
+  , path = require('path')
+  , LRU = require('lru-cache');
 
 try {
   fs.mkdirSync(__dirname + '/tmp');
@@ -38,7 +39,7 @@ function hook_stdio(stream, callback) {
  */
 
 function fixture(name) {
-  return read('test/fixtures/' + name, 'utf8').replace(/\r/g, '').trim();
+  return read('test/fixtures/' + name, 'utf8');
 }
 
 /**
@@ -125,6 +126,15 @@ suite('ejs.compile(str, options)', function () {
       assert.equal(preFn(), '<p>foo</p>');
     }
   });
+
+  test('not include rethrow() in client mode if compileDebug is false', function () {
+    var fn = ejs.compile('<p><%= "foo" %></p>', {
+               client: true
+             , compileDebug: false
+             });
+    // There could be a `rethrow` in the function declaration
+    assert((fn.toString().match(/rethrow/g) || []).length <= 1);
+  });
 });
 
 suite('ejs.render(str, data)', function () {
@@ -187,21 +197,37 @@ suite('ejs.render(str, data)', function () {
     ejs.localsName = 'locals';
   });
 
-  test('support caching (pass 1)', function () {
+  test('support caching', function () {
     var file = __dirname + '/tmp/render.ejs'
       , options = {cache: true, filename: file}
       , out = ejs.render('<p>Old</p>', {}, options)
       , expected = '<p>Old</p>';
     assert.equal(out, expected);
-  });
-
-  test('support caching (pass 2)', function () {
-    var file = __dirname + '/tmp/render.ejs'
-      , options = {cache: true, filename: file}
-      , out = ejs.render('<p>New</p>', {}, options)
-      , expected = '<p>Old</p>';
+    // Assert no change, still in cache
+    out = ejs.render('<p>New</p>', {}, options);
     assert.equal(out, expected);
   });
+
+  test('support LRU caching', function () {
+    var oldCache = ejs.cache
+      , file = __dirname + '/tmp/render.ejs'
+      , options = {cache: true, filename: file}
+      , out
+      , expected = '<p>Old</p>';
+
+    // Switch to LRU
+    ejs.cache = LRU();
+
+    out = ejs.render('<p>Old</p>', {}, options);
+    assert.equal(out, expected);
+    // Assert no change, still in cache
+    out = ejs.render('<p>New</p>', {}, options);
+    assert.equal(out, expected);
+
+    // Restore system cache
+    ejs.cache = oldCache;
+  });
+
 });
 
 suite('ejs.renderFile(path, [data], [options], fn)', function () {
@@ -210,14 +236,14 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
       if (err) {
         return done(err);
       }
-      assert.equal(html, '<p>hey</p>');
+      assert.equal(html, '<p>hey</p>\n');
       done();
     });
   });
 
   test('callback is async', function(done) {
     var async = false;
-    ejs.renderFile('test/fixtures/para.ejs', function(err, html) {
+    ejs.renderFile('test/fixtures/para.ejs', function() {
       if (async) {
         return done();
       }
@@ -233,7 +259,7 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
       if (err) {
         return done(err);
       }
-      assert.equal(html, '<h1>fonebone</h1>');
+      assert.equal(html, '<h1>fonebone</h1>\n');
       done();
     });
   });
@@ -251,7 +277,7 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
         doneCount = 2;
         return done(err);
       }
-      assert.equal(html, '<h1>fonebone</h1>');
+      assert.equal(html, '<h1>fonebone</h1>\n');
       doneCount++;
       if (doneCount === 2) {
         done();
@@ -303,7 +329,7 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
     });
   });
 
-  test('support caching (pass 1)', function (done) {
+  test('support caching', function (done) {
     var expected = '<p>Old</p>'
       , file = __dirname + '/tmp/renderFile.ejs'
       , options = {cache: true};
@@ -313,29 +339,24 @@ suite('ejs.renderFile(path, [data], [options], fn)', function () {
       if (err) {
         done(err);
       }
+      fs.writeFileSync(file, '<p>New</p>');
       assert.equal(out, expected);
-      done();
+
+      ejs.renderFile(file, {}, options, function (err, out) {
+        if (err) {
+          done(err);
+        }
+        // Assert no change, still in cache
+        assert.equal(out, expected);
+        done();
+      });
     });
   });
 
-  test('support caching (pass 2)', function (done) {
-    var expected = '<p>Old</p>'
-      , file = __dirname + '/tmp/renderFile.ejs'
-      , options = {cache: true};
-    fs.writeFileSync(file, '<p>New</p>');
-
-    ejs.renderFile(file, {}, options, function (err, out) {
-      if (err) {
-        done(err);
-      }
-      assert.equal(out, expected);
-      done();
-    });
-  });
 });
 
-suite('ejs.clearCache()', function () {
-  test('work properly', function () {
+suite('cache specific', function () {
+  test('`clearCache` work properly', function () {
     var expected = '<p>Old</p>'
       , file = __dirname + '/tmp/clearCache.ejs'
       , options = {cache: true, filename: file}
@@ -347,6 +368,67 @@ suite('ejs.clearCache()', function () {
     expected = '<p>New</p>';
     out = ejs.render('<p>New</p>', {}, options);
     assert.equal(out, expected);
+  });
+
+  test('`clearCache` work properly, LRU', function () {
+    var expected = '<p>Old</p>'
+      , oldCache = ejs.cache
+      , file = __dirname + '/tmp/clearCache.ejs'
+      , options = {cache: true, filename: file}
+      , out;
+
+    ejs.cache = LRU();
+
+    out = ejs.render('<p>Old</p>', {}, options);
+    assert.equal(out, expected);
+    ejs.clearCache();
+    expected = '<p>New</p>';
+    out = ejs.render('<p>New</p>', {}, options);
+    assert.equal(out, expected);
+
+    ejs.cache = oldCache;
+  });
+
+  test('LRU with cache-size 1', function () {
+    var oldCache = ejs.cache
+      , options
+      , out
+      , expected
+      , file;
+
+    ejs.cache = LRU(1);
+
+    file = __dirname + '/tmp/render1.ejs';
+    options = {cache: true, filename: file};
+    out = ejs.render('<p>File1</p>', {}, options);
+    expected = '<p>File1</p>';
+    assert.equal(out, expected);
+
+    // Same filename, different template, but output
+    // should be the same because cache
+    file = __dirname + '/tmp/render1.ejs';
+    options = {cache: true, filename: file};
+    out = ejs.render('<p>ChangedFile1</p>', {}, options);
+    expected = '<p>File1</p>';
+    assert.equal(out, expected);
+
+    // Different filiename -- output should be different,
+    // and previous cache-entry should be evicted
+    file = __dirname + '/tmp/render2.ejs';
+    options = {cache: true, filename: file};
+    out = ejs.render('<p>File2</p>', {}, options);
+    expected = '<p>File2</p>';
+    assert.equal(out, expected);
+
+    // Entry with first filename should now be out of cache,
+    // results should be different
+    file = __dirname + '/tmp/render1.ejs';
+    options = {cache: true, filename: file};
+    out = ejs.render('<p>ChangedFile1</p>', {}, options);
+    expected = '<p>ChangedFile1</p>';
+    assert.equal(out, expected);
+
+    ejs.cache = oldCache;
   });
 });
 
@@ -542,7 +624,7 @@ suite('include()', function () {
     assert.equal(
       ejs.render('<%- include("fixtures/includes/bom.ejs") %>',
         {}, {filename: path.join(__dirname, 'f.ejs')}),
-      '<p>This is a file with BOM.</p>');
+      '<p>This is a file with BOM.</p>\n');
   });
 
   test('include ejs with locals', function () {
@@ -603,29 +685,27 @@ suite('include()', function () {
     var file = 'test/fixtures/include_cache.ejs'
       , options = {filename: file}
       , out = ejs.compile(fixture('include_cache.ejs'), options);
-    assert.equal(out(), '<p>Old</p>');
+    assert.equal(out(), '<p>Old</p>\n');
 
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>New</p>');
-    assert.equal(out(), '<p>New</p>');
+    assert.equal(out(), '<p>New</p>\n');
   });
 
-  test('support caching (pass 1)', function () {
+  test('support caching', function () {
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>Old</p>');
     var file = 'test/fixtures/include_cache.ejs'
       , options = {cache: true, filename: file}
       , out = ejs.render(fixture('include_cache.ejs'), {}, options)
       , expected = fixture('include_cache.html');
     assert.equal(out, expected);
-  });
-
-  test('support caching (pass 2)', function () {
+    out = ejs.render(fixture('include_cache.ejs'), {}, options);
+    // No change, still in cache
+    assert.equal(out, expected);
     fs.writeFileSync(__dirname + '/tmp/include.ejs', '<p>New</p>');
-    var file = 'test/fixtures/include_cache.ejs'
-      , options = {cache: true, filename: file}
-      , out = ejs.render(fixture('include_cache.ejs'), {}, options)
-      , expected = fixture('include_cache.html');
+    out = ejs.render(fixture('include_cache.ejs'), {}, options);
     assert.equal(out, expected);
   });
+
 });
 
 suite('preprocessor include', function () {
@@ -650,7 +730,7 @@ suite('preprocessor include', function () {
     assert.equal(
       ejs.render('<% include fixtures/includes/bom.ejs %>',
         {}, {filename: path.join(__dirname, 'f.ejs')}),
-      '<p>This is a file with BOM.</p>');
+      '<p>This is a file with BOM.</p>\n');
   });
 
   test('work when nested', function () {
@@ -690,29 +770,24 @@ suite('preprocessor include', function () {
     var file = 'test/fixtures/include_preprocessor_cache.ejs'
       , options = {filename: file}
       , out = ejs.compile(fixture('include_preprocessor_cache.ejs'), options);
-    assert.equal(out(), '<p>Old</p>');
+    assert.equal(out(), '<p>Old</p>\n');
 
     fs.writeFileSync(__dirname + '/tmp/include_preprocessor.ejs', '<p>New</p>');
-    assert.equal(out(), '<p>Old</p>');
+    assert.equal(out(), '<p>Old</p>\n');
   });
 
-  test('support caching (pass 1)', function () {
+  test('support caching', function () {
     fs.writeFileSync(__dirname + '/tmp/include_preprocessor.ejs', '<p>Old</p>');
     var file = 'test/fixtures/include_preprocessor_cache.ejs'
       , options = {cache: true, filename: file}
       , out = ejs.render(fixture('include_preprocessor_cache.ejs'), {}, options)
       , expected = fixture('include_preprocessor_cache.html');
     assert.equal(out, expected);
-  });
-
-  test('support caching (pass 2)', function () {
     fs.writeFileSync(__dirname + '/tmp/include_preprocessor.ejs', '<p>New</p>');
-    var file = 'test/fixtures/include_preprocessor_cache.ejs'
-      , options = {cache: true, filename: file}
-      , out = ejs.render(fixture('include_preprocessor_cache.ejs'), {}, options)
-      , expected = fixture('include_preprocessor_cache.html');
+    out = ejs.render(fixture('include_preprocessor_cache.ejs'), {}, options);
     assert.equal(out, expected);
   });
+
 });
 
 suite('comments', function () {
