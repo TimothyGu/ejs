@@ -2,7 +2,8 @@
 
 ## v2.2.5: UNRELEASED
 
-+ Generated template functions are now prettier (ejs only) (@whitneyit)
++ Generated template functions are now prettier (ejs only) (@whitneyit in ejs,
+  @TimothyGu in ejs-js)
 + Add official documentation for EJS syntax (#9) (@TimothyGu)
 + Add inline JSDoc-style documentation for public functions (mde/ejs#9)
   (@TimothyGu)
