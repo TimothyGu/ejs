@@ -1,6 +1,6 @@
 # EJS v2 and this project's releases
 
-## v2.2.5: UNRELEASED
+## v2.3.0: UNRELEASED
 
 + Generated template functions are now prettier (ejs only) (@whitneyit in ejs,
   @TimothyGu in ejs-js)
