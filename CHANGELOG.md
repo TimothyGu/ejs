@@ -1,7 +1,9 @@
 # EJS v2 and this project's releases
 
-## v2.3.0: UNRELEASED
+## v2.3.1: 2015-03-10
 
+* Stop deferring execution of `renderFile` callback, revert to sync
+  execution (@mde)
 + Generated template functions are now prettier (ejs only) (@whitneyit in ejs,
   @TimothyGu in ejs-js)
 + Add official documentation for EJS syntax (#9) (@TimothyGu)

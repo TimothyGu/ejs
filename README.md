@@ -34,6 +34,13 @@ Note that EJS v2 is still a very active project. Do not refrain from using
 it because of this post. But instead, when you *do* start using EJS, check out
 this project as well :wink:.
 
+## Compatibility with official EJS
+
+This module aims to be fully compatible with EJS v2, but unfortunately one minor
+difference exist. This module does not support the use of `rmWhitespace` because
+of difficulty in implementing it in a char-by-char-reading architecture this
+module uses.
+
 ## Installation
 
 ```bash
