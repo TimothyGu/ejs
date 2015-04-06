@@ -1,5 +1,9 @@
 # EJS v2 and this project's releases
 
+## v2.3.2 (ejs-tj): 2015-04-06
+
+* Fix variable reference error
+
 ## v2.3.1: 2015-03-10
 
 * Stop deferring execution of `renderFile` callback, revert to sync
