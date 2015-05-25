@@ -17,6 +17,9 @@
  * whose name is specified by {@link module:ejs.localsName} (default to
  * `locals`).
  *
+ * @property {Boolean} [favorSpeed=true]
+ * Whether or not to favor speed over code size.
+ *
  * @property {Boolean} [client=false]
  * Whether or not to compile functions that are to be included in the browser.
  *
